@@ -1,21 +1,44 @@
 package lk.jiat.rmi;
 
-import lk.jiat.rmi.client.Message;
 import lk.jiat.rmi.client.UserService;
 import lk.jiat.rmi.model.User;
 
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class RMIClient {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 6666);
-            String[] list = registry.list();
-            for (String s : list) System.out.println(s);
-            Message message = (Message) registry.lookup("message_service");
+            //Can use LocateRegistry
+            
+//            Registry registry = LocateRegistry.getRegistry("localhost", 6666);
+//            String[] list = registry.list();
+//            for (String s : list) System.out.println(s);
+
+            //Can use LocateRegistry
+
+            //can use Naming
+
+            //  UserService userService = (UserService) Naming.lookup("rmi://127.0.0.1:6666/user_service");
+
+            //can use Naming
+
+
+            //can use InitialContext
+
+            Properties prop = new Properties();
+            prop.put(Context.PROVIDER_URL, "rmi://localhost:6666");
+            prop.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
+
+            InitialContext initialContext = new InitialContext(prop);
+            UserService userService = (UserService) initialContext.lookup("user_service");
+
+            //can use InitialContext
+
+//            Message message = (Message) registry.lookup("message_service");
 //            String msg = message.hello();
 //            System.out.println(msg);
 //            Integer total = 1000;
@@ -45,12 +68,14 @@ public class RMIClient {
 //
 //            System.out.println("********* Thank you for using us for your transaction *********");
 
-            UserService userService = (UserService) registry.lookup("user_service");
+//            UserService userService = (UserService) registry.lookup("user_service");
             userService.addUser(1,
                     new User(1, "Norlan", "Chilaw", "Norlan@gmail.com"));
             userService.getAllUsers().forEach(user -> {
                 System.out.println(user.getName());
             });
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
